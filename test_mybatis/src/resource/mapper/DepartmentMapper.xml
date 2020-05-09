@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.athu.mybatis.dao.DepartmentMapper">
+    <select id="selectDeptById" resultType="com.athu.mybatis.bean.Department">
+        select id ,d_name departmentName from tbl_department where id = #{id}
+    </select>
+
+<!--    //通过部门id查找员工信息（利用 resultMap（collection） 多表查询(分步) List集合）-->
+    <resultMap id="Dept" type="com.athu.mybatis.bean.Department">
+        <id column="id" property="id"></id>
+        <result column="d_name" property="departmentName"></result>
+        <collection property="empolyees"
+                    select="com.athu.mybatis.dao.EmployeeMapper.selectEmployeeByDid"
+                    column="{dId=id}" fetchType="eager"></collection><!--fetchType="eager" 取消延时加载-->
+    </resultMap>
+    <select id="selectDeptByIdStep" resultMap="Dept">
+        select id, d_name from tbl_department where id = #{id}
+    </select>
+</mapper>

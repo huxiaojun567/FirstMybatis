@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.athu.mybatis.dao.EmployeeMapper">
+
+
+    <select id="selectEmployeeById" resultType="Empolyee">
+        select id ,last_name,email ,gender from tbl_employee where id = #{id}
+    </select>
+
+    <!--
+        useGeneratedKeys:设置主键自增长
+        keyProperty:自增长属性值设置为JavaBean 中的哪个属性
+        若数据库支持自动生成主键的字段（比如 MySQL 和 SQL Server），则可以设置
+        useGeneratedKeys=”true”，然后再把 keyProperty 设置到目标属性上。
+    -->
+    <insert id="addEmployee" parameterType="com.athu.mybatis.bean.Empolyee" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_employee(last_name,email,gender) values(#{lastName},#{email},#{gender})
+    </insert>
+
+    <select id="selectEmployeeByIdAndNameParam" resultType="Empolyee">
+        select id ,last_name,email ,gender from tbl_employee where id = #{id} and last_name = #{lastName}
+    </select>
+
+    <!-- 查询一条数据保存在map中 -->
+    <select id="selectMapOne" resultType="map">
+        select id ,last_name,email ,gender from tbl_employee where id = #{id}
+    </select>
+
+    <!-- 查询多条数据保存在map中 -->
+    <select id="selectMap" resultType="Empolyee">
+        select id ,last_name,email ,gender from tbl_employee where last_name like #{lastName}
+    </select>
+
+    <!-- 利用resultMap进行多表查询 -->
+
+<!--    &lt;!&ndash;级联属性封装&ndash;&gt;-->
+<!--    <resultMap id="myEmp" type="Empolyee">-->
+<!--        <id column="id" property="id"></id>-->
+<!--        <result column="lastName" property="lastName"></result>-->
+<!--        <result column="email" property="email"></result>-->
+<!--        <result column="gender" property="gender"></result>-->
+<!--        <result column="did" property="department.id"></result>-->
+<!--        <result column="dname" property="department.departmentName"></result>-->
+<!--    </resultMap>-->
+
+    <!--联合属性封装-->
+    <resultMap id="myEmp" type="Empolyee">
+        <id column="id" property="id"></id>
+        <result column="lastName" property="lastName"></result>
+        <result column="email" property="email"></result>
+        <result column="gender" property="gender"></result>
+        <!--
+            association 可以指定联合的javabean对象(关联的是单个对象)
+            property="department" 指定那个属性是联合的对象
+            javaType="com.athu.mybatis.bean.Department" 指定对象具体是哪一个类
+        -->
+        <association property="department" javaType="com.athu.mybatis.bean.Department">
+            <id column="did" property="id"></id>
+            <result column="dname" property="departmentName"></result>
+        </association>
+    </resultMap>
+    <select id="selectEmployeeWithDepartment" resultMap="myEmp">
+        select e.id id ,e.last_name lastName,e.email email ,e.gender gender ,
+                e.d_id eid , d.id did,d.d_name dname from tbl_employee e,tbl_department d where e.d_id = d.id and e.id=#{id};
+    </select>
+
+
+    <!-- 利用 association 分步进行多表查询的方法-->
+    <resultMap id="myEmpOfStep" type="Empolyee">
+        <id column="id" property="id"></id>
+        <result column="last_name" property="lastName"></result>
+        <result column="email" property="email"></result>
+        <result column="gender" property="gender"></result>
+        <!--
+            association 可以指定联合的javabean对象(关联的是单个对象)
+            property="department" 指定那个属性是联合的对象
+            select="com.athu.mybatis.dao.DepartmentMapper.selectDeptById" 查找指定对象的方法
+            column="d_id" 传入查找方法的参数
+        -->
+        <association property="department"
+                     select="com.athu.mybatis.dao.DepartmentMapper.selectDeptById"
+                     column="d_id">
+        </association>
+    </resultMap>
+    <select id="selectEmployeeWithDepartmentOfStep" resultMap="myEmpOfStep">
+        select * from tbl_employee where id = #{id}
+    </select>
+
+<!--    通过部门id查找员工-->
+    <select id="selectEmployeeByDid" resultType="com.athu.mybatis.bean.Empolyee">
+        select id,last_name,email,gender from tbl_employee where d_id = #{dId}
+    </select>
+</mapper>

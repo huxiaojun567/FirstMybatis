@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+
+<configuration>
+    <!--引入数据库的配置文件-->
+    <properties resource="resource/jdbc.properties"></properties>
+
+    <settings>
+        <!-- 设置驼峰命名法-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!--开启延时加载-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!--是否按需加载属性 true:都全部加载 false:按需加载-->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        <setting name="logImpl" value="LOG4J"/>
+    </settings>
+
+    <!--设置别名-->
+    <typeAliases>
+        <typeAlias type="com.athu.mybatis.bean.Empolyee" alias="Empolyee"></typeAlias>
+    </typeAliases>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC" />
+            <dataSource type="POOLED">
+               <property name="driver" value="${mysql.driver}"/>
+               <property name="url" value="${mysql.url}" />
+                <property name="username" value="${username}" />
+                <property name="password" value="${password}" />
+            </dataSource>
+        </environment>
+    </environments>
+    <!-- 引入SQL映射文件,Mapper映射文件 -->
+    <mappers>
+        <mapper resource="resource/mapper/DepartmentMapper.xml"></mapper>
+        <mapper resource="resource/mapper/EmployeeMapper.xml"></mapper>
+        <mapper resource="resource/mapper/EmployeeMapperDynamicSql.xml"></mapper>
+    </mappers>
+</configuration>
